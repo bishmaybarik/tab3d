@@ -1,0 +1,7 @@
+v 3
+d tab3d: Three-dimensional tabulation for Stata with enhanced visual formatting
+d Author: Bishmay Barik, bishmaykbarik@gmail.com
+d Distribution-Date: 09sep2025
+d Stata-Version: 14
+f tab3d.ado
+f tab3d.sthlp

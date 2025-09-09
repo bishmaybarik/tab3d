@@ -12,12 +12,12 @@ d Keywords: tabulation, cross-tabulation, 3D tables, categorical data
 d
 d Description:
 d tab3d extends Stata's standard tabulation commands to handle three categorical 
-d variables simultaneously. It creates layered frequency tables where each layer 
-d represents one level of the third variable, making it easy to examine 
-d relationships between three categorical variables.
+d variables simultaneously (both numeric and string). It creates layered frequency 
+d tables where each layer represents one level of the third variable, making it easy 
+d to examine relationships between three categorical variables.
 d
-d Features include percentage calculations, missing value handling, and matrix 
-d output for further analysis.
+d Features include string and numeric variable support, percentage calculations, 
+d missing value handling, and matrix output for further analysis.
 d
 f tab3d.ado
 f tab3d.sthlp

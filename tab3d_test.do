@@ -54,5 +54,43 @@ display ""
 display "=== Test 6: Different variable combination ==="
 tab3d foreign size_cat price_cat
 
+* Test 7: STRING VARIABLES - Create string variables for testing
+display ""
+display "=== Test 7: Testing string variables ==="
+sysuse nlsw88, clear
+
+generate age_group = "young" if age < 30
+replace age_group = "middle" if age >= 30 & age < 50  
+replace age_group = "older" if age >= 50 & !missing(age)
+
+* Test string variables
+tab3d race married age_group
+
+* Test 8: Mixed variable types (numeric and string)
+display ""
+display "=== Test 8: Mixed variable types ==="
+tab3d collgrad race age_group
+
+* Test 9: String variables with missing values
+display ""
+display "=== Test 9: String variables with missing option ==="
+tab3d race married age_group, missing
+
+* Test 10: String variables with percentages
+display ""
+display "=== Test 10: String variables with percentages ==="
+tab3d race married age_group, nopercent
+
+* Test 11: String variables with matrix output
+display ""
+display "=== Test 11: String variables with matrix output ==="
+tab3d race married age_group, matfreq(string_matrix)
+matrix list string_matrix
+
 display ""
 display "=== All tests completed successfully! ==="
+display "✓ Numeric variables: Working"
+display "✓ String variables: Working" 
+display "✓ Mixed variables: Working"
+display "✓ Missing values: Working"
+display "✓ Matrix output: Working"

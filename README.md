@@ -4,7 +4,7 @@
 
 ## Overview
 
-Tab3d extends Stata's standard tabulation functionality to handle three categorical variables simultaneously. It creates layered frequency tables where each layer represents one level of the third variable.
+Tab3d extends Stata's standard tabulation functionality to handle three categorical variables simultaneously (both numeric and string). It creates layered frequency tables where each layer represents one level of the third variable.
 
 ## Installation
 
@@ -28,6 +28,7 @@ tab3d foreign rep78 price_cat
 ## Features
 
 - Three-dimensional cross-tabulation
+- Support for both numeric and string variables
 - Layered display for three variables  
 - Frequency and percentage tables
 - Summary statistics
@@ -44,15 +45,22 @@ tab3d var1 var2 var3 [if] [in] [, options]
 ## Examples
 
 ```stata
-// Basic usage
+// Basic usage with numeric variables
 sysuse auto
 tab3d foreign rep78 price_cat
 
+// String variables
+sysuse nlsw88, clear
+generate age_group = "young" if age < 30
+replace age_group = "middle" if age >= 30 & age < 50
+replace age_group = "older" if age >= 50
+tab3d race married age_group
+
 // Include missing values
-tab3d foreign rep78 price_cat, missing
+tab3d race married age_group, missing
 
 // Save frequency matrix
-tab3d foreign rep78 price_cat, matfreq(freq_matrix)
+tab3d race married age_group, matfreq(freq_matrix)
 ```
 
 ## Requirements

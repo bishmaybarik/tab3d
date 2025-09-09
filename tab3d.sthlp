@@ -60,13 +60,14 @@
 {pstd}
 {cmd:tab3d} displays three-dimensional tabulation tables. It extends Stata's standard 
 {cmd:tabulate} command to handle three categorical variables simultaneously, creating 
-layered displays where each layer represents one level of the third variable.
+layered displays where each layer represents one level of the third variable. The 
+command works with both numeric and string variables.
 
 {pstd}
 The command produces frequency tables organized as layers, where each layer shows 
 a two-way cross-tabulation of the first two variables for a specific value of the 
 third variable. This is useful for examining relationships between three categorical 
-variables.
+variables of any type (numeric, string, or mixed).
 
 
 {marker options}{...}
@@ -142,23 +143,35 @@ in matrix {it:matname}.
 {marker examples}{...}
 {title:Examples}
 
-{pstd}Setup{p_end}
+{pstd}Setup with numeric variables{p_end}
 {phang2}{cmd:. sysuse auto}{p_end}
 {phang2}{cmd:. generate price_cat = 1 if price < 5000}{p_end}
 {phang2}{cmd:. replace price_cat = 2 if price >= 5000 & price < 10000}{p_end}
 {phang2}{cmd:. replace price_cat = 3 if price >= 10000 & !missing(price)}{p_end}
 
-{pstd}Basic three-way tabulation{p_end}
+{pstd}Basic three-way tabulation with numeric variables{p_end}
 {phang2}{cmd:. tab3d foreign rep78 price_cat}{p_end}
 
+{pstd}Setup with string variables{p_end}
+{phang2}{cmd:. sysuse nlsw88, clear}{p_end}
+{phang2}{cmd:. generate age_group = "young" if age < 30}{p_end}
+{phang2}{cmd:. replace age_group = "middle" if age >= 30 & age < 50}{p_end}
+{phang2}{cmd:. replace age_group = "older" if age >= 50 & !missing(age)}{p_end}
+
+{pstd}Three-way tabulation with string variables{p_end}
+{phang2}{cmd:. tab3d race married age_group}{p_end}
+
+{pstd}Mixed variable types (numeric and string){p_end}
+{phang2}{cmd:. tab3d collgrad race age_group}{p_end}
+
 {pstd}Include missing values{p_end}
-{phang2}{cmd:. tab3d foreign rep78 price_cat, missing}{p_end}
+{phang2}{cmd:. tab3d race married age_group, missing}{p_end}
 
 {pstd}Display percentages only{p_end}
-{phang2}{cmd:. tab3d foreign rep78 price_cat, nofreq cellpercent}{p_end}
+{phang2}{cmd:. tab3d race married age_group, nofreq cellpercent}{p_end}
 
 {pstd}Save frequencies to matrix{p_end}
-{phang2}{cmd:. tab3d foreign rep78 price_cat, matfreq(freq_matrix)}{p_end}
+{phang2}{cmd:. tab3d race married age_group, matfreq(freq_matrix)}{p_end}
 
 
 {marker results}{...}
