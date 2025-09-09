@@ -1,0 +1,6 @@
+v 3
+d Materials from Bishmay Barik
+d bishmaykbarik@gmail.com  
+d https://github.com/bishmaykbarik
+d
+d 'tab3d': Three-dimensional tabulation for Stata
