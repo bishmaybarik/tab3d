@@ -1,5 +1,17 @@
 # String Handling Improvements for tab3d Command
 
+## Root Cause Identified and Fixed
+
+### **The Core Issue: Double-Quoting String Values**
+**Problem**: The `levelsof` command without the `clean` option returns string values that are **already properly quoted** for use in Stata conditions. However, the original code was adding additional compound quotes `"`level'"` around these already-quoted values, creating malformed conditions like:
+```stata
+region == `""North America""'  // WRONG - double quoted
+```
+instead of:
+```stata
+region == "North America"      // CORRECT
+```
+
 ## Issues Fixed
 
 ### 1. **levelsof Command with String Variables**
@@ -7,17 +19,17 @@
 
 **Solution**:
 - Conditional use of `clean` option - only for numeric variables
-- String variables use default `levelsof` behavior which properly handles complex strings
+- String variables use default `levelsof` behavior which returns properly quoted strings
 - Lines 80-97 in tab3d.ado
 
-### 2. **String Comparison Robustness**
-**Problem**: String comparisons could fail with certain characters or edge cases, leading to "no observations" errors.
+### 2. **String Comparison Logic - MAIN FIX**
+**Problem**: Double-quoting string values from `levelsof` output caused all string conditions to fail, leading to "no observations" errors.
 
 **Solution**:
-- Added `capture` statements before all `count if` operations
-- Proper error handling when string comparisons fail
-- Consistent use of compound quotes `"`level'"` for string values
-- Applied throughout lines 116-160, 200-230, 250-290, 337-447
+- **Removed compound quotes** from string comparisons
+- String variables now use: `variable == level` (not `variable == "`level'"`)
+- Numeric variables still use: `variable == level`
+- Applied throughout lines 125-146, 207-224, 255-268, 349-366, 385-397, 419-431
 
 ### 3. **Layer Label Display**
 **Problem**: Long string values in layer headers could cause display issues.

@@ -121,25 +121,25 @@ program define tab3d, rclass
                 // Build condition string with proper string escaping
                 local condition ""
 
-                // Handle var1 with robust string comparison
+                // Handle var1 with proper string comparison
                 if `is_string_`var1'' {
-                    local condition "`condition' `var1' == `"`level1'"'"
+                    local condition "`condition' `var1' == `level1'"
                 }
                 else {
                     local condition "`condition' `var1' == `level1'"
                 }
 
-                // Handle var2 with robust string comparison
+                // Handle var2 with proper string comparison
                 if `is_string_`var2'' {
-                    local condition "`condition' & `var2' == `"`level2'"'"
+                    local condition "`condition' & `var2' == `level2'"
                 }
                 else {
                     local condition "`condition' & `var2' == `level2'"
                 }
 
-                // Handle var3 with robust string comparison
+                // Handle var3 with proper string comparison
                 if `is_string_`var3'' {
-                    local condition "`condition' & `var3' == `"`level3'"'"
+                    local condition "`condition' & `var3' == `level3'"
                 }
                 else {
                     local condition "`condition' & `var3' == `level3'"
@@ -202,22 +202,22 @@ program define tab3d, rclass
             local row_total = 0
             
             foreach level2 of local levels2 {
-                // Build condition for display with robust string handling
+                // Build condition for display with proper string handling
                 local condition ""
                 if `is_string_`var1'' {
-                    local condition "`condition' `var1' == `"`level1'"'"
+                    local condition "`condition' `var1' == `level1'"
                 }
                 else {
                     local condition "`condition' `var1' == `level1'"
                 }
                 if `is_string_`var2'' {
-                    local condition "`condition' & `var2' == `"`level2'"'"
+                    local condition "`condition' & `var2' == `level2'"
                 }
                 else {
                     local condition "`condition' & `var2' == `level2'"
                 }
                 if `is_string_`var3'' {
-                    local condition "`condition' & `var3' == `"`level3'"'"
+                    local condition "`condition' & `var3' == `level3'"
                 }
                 else {
                     local condition "`condition' & `var3' == `level3'"
@@ -252,16 +252,16 @@ program define tab3d, rclass
         di as text %10s "{bf:Total}" " {c |}", _c
         local layer_total = 0
         foreach level2 of local levels2 {
-            // Build condition for column totals with robust string handling
+            // Build condition for column totals with proper string handling
             local condition ""
             if `is_string_`var2'' {
-                local condition "`condition' `var2' == `"`level2'"'"
+                local condition "`condition' `var2' == `level2'"
             }
             else {
                 local condition "`condition' `var2' == `level2'"
             }
             if `is_string_`var3'' {
-                local condition "`condition' & `var3' == `"`level3'"'"
+                local condition "`condition' & `var3' == `level3'"
             }
             else {
                 local condition "`condition' & `var3' == `level3'"
@@ -278,9 +278,9 @@ program define tab3d, rclass
             di as result %10.0f `col_total', _c
         }
         
-        // Layer total with robust string handling
+        // Layer total with proper string handling
         if `is_string_`var3'' {
-            capture qui count if `var3' == `"`level3'"'
+            capture qui count if `var3' == `level3'
         }
         else {
             capture qui count if `var3' == `level3'
@@ -344,22 +344,22 @@ program define tab3d, rclass
                 di as text %10s "`level1'" " {c |}", _c
                 
                 foreach level2 of local levels2 {
-                    // Build condition for percentage calculation with robust string handling
+                    // Build condition for percentage calculation with proper string handling
                     local condition ""
                     if `is_string_`var1'' {
-                        local condition "`condition' `var1' == `"`level1'"'"
+                        local condition "`condition' `var1' == `level1'"
                     }
                     else {
                         local condition "`condition' `var1' == `level1'"
                     }
                     if `is_string_`var2'' {
-                        local condition "`condition' & `var2' == `"`level2'"'"
+                        local condition "`condition' & `var2' == `level2'"
                     }
                     else {
                         local condition "`condition' & `var2' == `level2'"
                     }
                     if `is_string_`var3'' {
-                        local condition "`condition' & `var3' == `"`level3'"'"
+                        local condition "`condition' & `var3' == `level3'"
                     }
                     else {
                         local condition "`condition' & `var3' == `level3'"
@@ -381,16 +381,16 @@ program define tab3d, rclass
                     }
                 }
                 
-                // Row percentage totals with robust string handling
+                // Row percentage totals with proper string handling
                 local condition ""
                 if `is_string_`var1'' {
-                    local condition "`condition' `var1' == `"`level1'"'"
+                    local condition "`condition' `var1' == `level1'"
                 }
                 else {
                     local condition "`condition' `var1' == `level1'"
                 }
                 if `is_string_`var3'' {
-                    local condition "`condition' & `var3' == `"`level3'"'"
+                    local condition "`condition' & `var3' == `level3'"
                 }
                 else {
                     local condition "`condition' & `var3' == `level3'"
@@ -415,16 +415,16 @@ program define tab3d, rclass
             // Column percentage totals
             di as text %10s "{bf:Total}" " {c |}", _c
             foreach level2 of local levels2 {
-                // Build condition for column percentages with robust string handling
+                // Build condition for column percentages with proper string handling
                 local condition ""
                 if `is_string_`var2'' {
-                    local condition "`condition' `var2' == `"`level2'"'"
+                    local condition "`condition' `var2' == `level2'"
                 }
                 else {
                     local condition "`condition' `var2' == `level2'"
                 }
                 if `is_string_`var3'' {
-                    local condition "`condition' & `var3' == `"`level3'"'"
+                    local condition "`condition' & `var3' == `level3'"
                 }
                 else {
                     local condition "`condition' & `var3' == `level3'"
@@ -440,9 +440,9 @@ program define tab3d, rclass
                 di as result %9.2f `col_pct' "%", _c
             }
             
-            // Layer percentage total with robust string handling
+            // Layer percentage total with proper string handling
             if `is_string_`var3'' {
-                capture qui count if `var3' == `"`level3'"'
+                capture qui count if `var3' == `level3'
             }
             else {
                 capture qui count if `var3' == `level3'
