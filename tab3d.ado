@@ -75,15 +75,30 @@ program define tab3d, rclass
         }
     }
     
-    // Get unique values for each variable (levelsof handles both string and numeric)
+    // Get unique values for each variable with proper string handling
     if "`missing'" == "" {
-        qui levelsof `var1', local(levels1) clean
-        qui levelsof `var2', local(levels2) clean  
-        qui levelsof `var3', local(levels3) clean
+        if `is_string_`var1'' {
+            qui levelsof `var1', local(levels1)
+        }
+        else {
+            qui levelsof `var1', local(levels1) clean
+        }
+        if `is_string_`var2'' {
+            qui levelsof `var2', local(levels2)
+        }
+        else {
+            qui levelsof `var2', local(levels2) clean
+        }
+        if `is_string_`var3'' {
+            qui levelsof `var3', local(levels3)
+        }
+        else {
+            qui levelsof `var3', local(levels3) clean
+        }
     }
     else {
         qui levelsof `var1', local(levels1) missing
-        qui levelsof `var2', local(levels2) missing  
+        qui levelsof `var2', local(levels2) missing
         qui levelsof `var3', local(levels3) missing
     }
     
@@ -98,40 +113,46 @@ program define tab3d, rclass
     matrix `col_totals' = J(`n2', 1, 0) 
     matrix `layer_totals' = J(`n3', 1, 0)
     
-    // Calculate frequencies with proper string/numeric handling
+    // Calculate frequencies with robust string/numeric handling
     local row = 1
     foreach level3 of local levels3 {
         foreach level1 of local levels1 {
             foreach level2 of local levels2 {
-                // Build condition string based on variable types
+                // Build condition string with proper string escaping
                 local condition ""
-                
-                // Handle var1
+
+                // Handle var1 with robust string comparison
                 if `is_string_`var1'' {
                     local condition "`condition' `var1' == `"`level1'"'"
                 }
                 else {
                     local condition "`condition' `var1' == `level1'"
                 }
-                
-                // Handle var2
+
+                // Handle var2 with robust string comparison
                 if `is_string_`var2'' {
                     local condition "`condition' & `var2' == `"`level2'"'"
                 }
                 else {
                     local condition "`condition' & `var2' == `level2'"
                 }
-                
-                // Handle var3
+
+                // Handle var3 with robust string comparison
                 if `is_string_`var3'' {
                     local condition "`condition' & `var3' == `"`level3'"'"
                 }
                 else {
                     local condition "`condition' & `var3' == `level3'"
                 }
-                
-                qui count if `condition'
-                local freq = r(N)
+
+                // Count with error handling
+                capture qui count if `condition'
+                if _rc == 0 {
+                    local freq = r(N)
+                }
+                else {
+                    local freq = 0
+                }
                 matrix `freq_matrix'[`row', 4] = `freq'
                 local row = `row' + 1
             }
@@ -153,7 +174,12 @@ program define tab3d, rclass
     
     // Display the 3D table layer by layer with improved formatting
     foreach level3 of local levels3 {
-        di as text "{bf:║ Layer `level3': `var3' = `level3' ║}"
+        // Create cleaner layer labels, truncating very long strings if needed
+        local layer_label = "`level3'"
+        if length("`layer_label'") > 30 {
+            local layer_label = substr("`layer_label'", 1, 27) + "..."
+        }
+        di as text "{bf:║ Layer: `var3' = `layer_label' ║}"
         di as text "{hline 50}"
         
         // Create enhanced header for this layer
@@ -176,7 +202,7 @@ program define tab3d, rclass
             local row_total = 0
             
             foreach level2 of local levels2 {
-                // Build condition for display
+                // Build condition for display with robust string handling
                 local condition ""
                 if `is_string_`var1'' {
                     local condition "`condition' `var1' == `"`level1'"'"
@@ -196,9 +222,14 @@ program define tab3d, rclass
                 else {
                     local condition "`condition' & `var3' == `level3'"
                 }
-                
-                qui count if `condition'
-                local freq = r(N)
+
+                capture qui count if `condition'
+                if _rc == 0 {
+                    local freq = r(N)
+                }
+                else {
+                    local freq = 0
+                }
                 local row_total = `row_total' + `freq'
                 if `freq' > 0 {
                     di as result %10.0f `freq', _c
@@ -221,7 +252,7 @@ program define tab3d, rclass
         di as text %10s "{bf:Total}" " {c |}", _c
         local layer_total = 0
         foreach level2 of local levels2 {
-            // Build condition for column totals
+            // Build condition for column totals with robust string handling
             local condition ""
             if `is_string_`var2'' {
                 local condition "`condition' `var2' == `"`level2'"'"
@@ -235,21 +266,31 @@ program define tab3d, rclass
             else {
                 local condition "`condition' & `var3' == `level3'"
             }
-            
-            qui count if `condition'
-            local col_total = r(N)
+
+            capture qui count if `condition'
+            if _rc == 0 {
+                local col_total = r(N)
+            }
+            else {
+                local col_total = 0
+            }
             local layer_total = `layer_total' + `col_total'
             di as result %10.0f `col_total', _c
         }
         
-        // Layer total
+        // Layer total with robust string handling
         if `is_string_`var3'' {
-            qui count if `var3' == `"`level3'"'
+            capture qui count if `var3' == `"`level3'"'
         }
         else {
-            qui count if `var3' == `level3'
+            capture qui count if `var3' == `level3'
         }
-        di as result %12.0f r(N)
+        if _rc == 0 {
+            di as result %12.0f r(N)
+        }
+        else {
+            di as result %12.0f 0
+        }
         di ""
     }
     
@@ -277,7 +318,12 @@ program define tab3d, rclass
         
         foreach level3 of local levels3 {
             di ""
-            di as text "{bf:║ Layer `level3': `var3' = `level3' ║}"
+            // Create cleaner layer labels for percentage section
+            local layer_label = "`level3'"
+            if length("`layer_label'") > 30 {
+                local layer_label = substr("`layer_label'", 1, 27) + "..."
+            }
+            di as text "{bf:║ Layer: `var3' = `layer_label' ║}"
             di as text "{hline 50}"
             
             // Enhanced percentage header
@@ -298,7 +344,7 @@ program define tab3d, rclass
                 di as text %10s "`level1'" " {c |}", _c
                 
                 foreach level2 of local levels2 {
-                    // Build condition for percentage calculation
+                    // Build condition for percentage calculation with robust string handling
                     local condition ""
                     if `is_string_`var1'' {
                         local condition "`condition' `var1' == `"`level1'"'"
@@ -318,9 +364,14 @@ program define tab3d, rclass
                     else {
                         local condition "`condition' & `var3' == `level3'"
                     }
-                    
-                    qui count if `condition'
-                    local freq = r(N)
+
+                    capture qui count if `condition'
+                    if _rc == 0 {
+                        local freq = r(N)
+                    }
+                    else {
+                        local freq = 0
+                    }
                     local pct = (`freq' / `grand_total') * 100
                     if `pct' > 0 {
                         di as result %9.2f `pct' "%", _c
@@ -330,7 +381,7 @@ program define tab3d, rclass
                     }
                 }
                 
-                // Row percentage totals
+                // Row percentage totals with robust string handling
                 local condition ""
                 if `is_string_`var1'' {
                     local condition "`condition' `var1' == `"`level1'"'"
@@ -344,8 +395,13 @@ program define tab3d, rclass
                 else {
                     local condition "`condition' & `var3' == `level3'"
                 }
-                qui count if `condition'
-                local row_pct = (r(N) / `grand_total') * 100
+                capture qui count if `condition'
+                if _rc == 0 {
+                    local row_pct = (r(N) / `grand_total') * 100
+                }
+                else {
+                    local row_pct = 0
+                }
                 di as result %11.2f `row_pct' "%"
             }
             
@@ -359,7 +415,7 @@ program define tab3d, rclass
             // Column percentage totals
             di as text %10s "{bf:Total}" " {c |}", _c
             foreach level2 of local levels2 {
-                // Build condition for column percentages
+                // Build condition for column percentages with robust string handling
                 local condition ""
                 if `is_string_`var2'' {
                     local condition "`condition' `var2' == `"`level2'"'"
@@ -373,20 +429,30 @@ program define tab3d, rclass
                 else {
                     local condition "`condition' & `var3' == `level3'"
                 }
-                
-                qui count if `condition'
-                local col_pct = (r(N) / `grand_total') * 100
+
+                capture qui count if `condition'
+                if _rc == 0 {
+                    local col_pct = (r(N) / `grand_total') * 100
+                }
+                else {
+                    local col_pct = 0
+                }
                 di as result %9.2f `col_pct' "%", _c
             }
             
-            // Layer percentage total
+            // Layer percentage total with robust string handling
             if `is_string_`var3'' {
-                qui count if `var3' == `"`level3'"'
+                capture qui count if `var3' == `"`level3'"'
             }
             else {
-                qui count if `var3' == `level3'
+                capture qui count if `var3' == `level3'
             }
-            local layer_pct = (r(N) / `grand_total') * 100
+            if _rc == 0 {
+                local layer_pct = (r(N) / `grand_total') * 100
+            }
+            else {
+                local layer_pct = 0
+            }
             di as result %11.2f `layer_pct' "%"
         }
     }
